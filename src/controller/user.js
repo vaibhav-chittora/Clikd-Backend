@@ -1,5 +1,6 @@
 import xlsx from "xlsx";
 import { getCandidates, insertCandidates } from "../service/user.js";
+import User from "../models/user.js";
 
 // Upload Excel & Save Users
 export const uploadCandidates = async (req, res) => {
@@ -43,5 +44,29 @@ export const fetchCandidates = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ✅ Update Candidate Data
+
+export const updateCandidate = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedData = req.body;
+
+    const updatedCandidate = await User.findByIdAndUpdate(id, updatedData, {
+      new: true,
+    });
+
+    if (!updatedCandidate) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Candidate not found" });
+    }
+
+    res.status(200).json({ success: true, data: updatedCandidate });
+  } catch (error) {
+    console.error("Error updating candidate:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
